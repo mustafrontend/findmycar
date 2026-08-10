@@ -23,13 +23,14 @@ workflows:
           keychain initialize
           app-store-connect fetch-signing-files "com.findmycar.parkedlocation" \
             --type IOS_APP_STORE \
+            --certificate-key @env:CERTIFICATE_PRIVATE_KEY \
             --create
           keychain add-certificates
-          xcode-project use-profiles --warn-only
+          xcode-project use-profiles
       - name: Set build number
         script: |
           cd ios/App
-          agvtool new-version -all ${PROJECT_BUILD_NUMBER:-1}
+          agvtool new-version -all $PROJECT_BUILD_NUMBER
       - name: Build iOS Xcode App
         script: |
           xcode-project build-ipa \

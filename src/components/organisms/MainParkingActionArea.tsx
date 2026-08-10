@@ -30,23 +30,28 @@ export const MainParkingActionArea: React.FC = () => {
   const handleShare = async () => {
     if (!currentSpot) return;
     soundService.playClickSound();
-    const shareUrl = locationService.generateShareUrl(currentSpot);
-    const shareData = {
-      title: t.appName,
-      text: `🚗 ${currentSpot.floorNote ? currentSpot.floorNote + ' - ' : ''}Arabamın Park Konumu:`,
-      url: shareUrl,
-    };
+
+    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${currentSpot.latitude},${currentSpot.longitude}`;
+    const floorInfo = currentSpot.floorNote ? ` (${currentSpot.floorNote})` : '';
+    const shareText = `🚗 Arabamın Park Konumu${floorInfo}:\n${googleMapsUrl}`;
 
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
-        await navigator.share(shareData);
+        await navigator.share({
+          title: 'Arabamın Konumu',
+          text: shareText,
+          url: googleMapsUrl,
+        });
+        return;
       } catch {
-        navigator.clipboard.writeText(shareUrl);
-        alert(t.shareSuccess);
+        // Fallback to direct WhatsApp
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+        window.open(whatsappUrl, '_blank');
       }
     } else {
-      navigator.clipboard.writeText(shareUrl);
-      alert(t.shareSuccess);
+      // Direct WhatsApp fallback
+      const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+      window.open(whatsappUrl, '_blank');
     }
   };
 

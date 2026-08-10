@@ -2,7 +2,7 @@ import React from 'react';
 import { useParkingStore } from '../../store/parkingStore';
 import { translations } from '../../i18n/translations';
 import { Badge } from '../atoms/Badge';
-import { Car, Globe, Sparkles, Smartphone, History, Zap, Apple } from 'lucide-react';
+import { Globe, Sparkles, Smartphone, History, Zap, Apple } from 'lucide-react';
 import type { LanguageCode } from '../../types/parking';
 
 export const HeaderNavbar: React.FC = () => {
@@ -46,9 +46,11 @@ export const HeaderNavbar: React.FC = () => {
         <div className="flex items-center justify-between gap-2">
           {/* Brand Logo & Name */}
           <div className="flex items-center gap-2 shrink-0">
-            <div className="w-9 h-9 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-md">
-              <Car className="w-4.5 h-4.5 text-emerald-400" />
-            </div>
+            <img
+              src="/app_logo.jpg"
+              alt="Find My Car Logo"
+              className="w-9 h-9 rounded-2xl object-cover shadow-md border border-slate-200 shrink-0"
+            />
             <div>
               <h1 className="text-sm font-black tracking-tight text-slate-900 leading-tight">
                 {t.appName}

@@ -1,0 +1,16 @@
+{
+  "appId": "com.findmycar.parkedlocation",
+  "appName": "Find My Car",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon_config_sample",
+      "iconColor": "#16a34a",
+      "sound": "beep.wav"
+    }
+  }
+}

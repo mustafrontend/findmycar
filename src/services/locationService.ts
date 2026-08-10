@@ -1,13 +1,22 @@
 import type { NavigationMetrics, ParkingSpot } from '../types/parking';
+import { Geolocation } from '@capacitor/geolocation';
 
 export class LocationService {
   /**
-   * Get current device geolocation with fallback for low GPS signals
+   * Get current device geolocation with zero-hanging 3.5s defensive timeout fallback
    */
   public async getCurrentPosition(): Promise<{ spot: ParkingSpot; isLowSignal: boolean }> {
-    return new Promise((resolve) => {
-      if (!navigator.geolocation) {
-        // Fallback default coordinates if geolocation unsupported
+    return new Promise(async (resolve) => {
+      let isResolved = false;
+
+      const safeResolve = (spot: ParkingSpot, isLowSignal: boolean) => {
+        if (isResolved) return;
+        isResolved = true;
+        resolve({ spot, isLowSignal });
+      };
+
+      // 3.5s Defensive hard timeout guard - NEVER stay stuck on loading!
+      const timerId = setTimeout(() => {
         const fallbackSpot: ParkingSpot = {
           id: `spot_${Date.now()}`,
           latitude: 41.0082,
@@ -17,47 +26,84 @@ export class LocationService {
           address: "AVM Kapalı Otopark / Indoor Parking",
           isLowGpsSignal: true,
         };
-        resolve({ spot: fallbackSpot, isLowSignal: true });
-        return;
-      }
+        safeResolve(fallbackSpot, true);
+      }, 3500);
 
-      const options: PositionOptions = {
-        enableHighAccuracy: true,
-        timeout: 8000,
-        maximumAge: 0,
-      };
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const accuracy = position.coords.accuracy || 10;
-          const isLowSignal = accuracy > 35; // If accuracy is >35m, flag low GPS
+      // Try Native Capacitor Geolocation first
+      try {
+        const permission = await Geolocation.requestPermissions();
+        if (permission.location === 'granted' || permission.coarseLocation === 'granted') {
+          const pos = await Geolocation.getCurrentPosition({
+            enableHighAccuracy: true,
+            timeout: 3000,
+            maximumAge: 0,
+          });
+          clearTimeout(timerId);
+          const accuracy = pos.coords.accuracy || 10;
+          const isLowSignal = accuracy > 35;
           const spot: ParkingSpot = {
             id: `spot_${Date.now()}`,
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
             accuracy: Math.round(accuracy),
-            timestamp: position.timestamp || Date.now(),
-            address: `${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}`,
+            timestamp: pos.timestamp || Date.now(),
+            address: `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`,
             isLowGpsSignal: isLowSignal,
           };
-          resolve({ spot, isLowSignal });
-        },
-        (error) => {
-          console.warn("GPS error or low signal fallback:", error.message);
-          // High-level fallback: Use estimated last known location
-          const fallbackSpot: ParkingSpot = {
-            id: `spot_${Date.now()}`,
-            latitude: 41.0082,
-            longitude: 28.9784,
-            accuracy: 60,
-            timestamp: Date.now(),
-            address: "AVM Kapalı Otopark (-2. Kat)",
-            isLowGpsSignal: true,
-          };
-          resolve({ spot: fallbackSpot, isLowSignal: true });
-        },
-        options
-      );
+          safeResolve(spot, isLowSignal);
+          return;
+        }
+      } catch (err) {
+        console.warn("Capacitor native geolocation error, fallback to web API:", err);
+      }
+
+      // Web Geolocation Fallback
+      if (typeof navigator !== 'undefined' && navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            clearTimeout(timerId);
+            const accuracy = position.coords.accuracy || 10;
+            const isLowSignal = accuracy > 35;
+            const spot: ParkingSpot = {
+              id: `spot_${Date.now()}`,
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              accuracy: Math.round(accuracy),
+              timestamp: position.timestamp || Date.now(),
+              address: `${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}`,
+              isLowGpsSignal: isLowSignal,
+            };
+            safeResolve(spot, isLowSignal);
+          },
+          (error) => {
+            clearTimeout(timerId);
+            console.warn("GPS error fallback:", error.message);
+            const fallbackSpot: ParkingSpot = {
+              id: `spot_${Date.now()}`,
+              latitude: 41.0082,
+              longitude: 28.9784,
+              accuracy: 60,
+              timestamp: Date.now(),
+              address: "AVM Kapalı Otopark (-2. Kat)",
+              isLowGpsSignal: true,
+            };
+            safeResolve(fallbackSpot, true);
+          },
+          { enableHighAccuracy: false, timeout: 3000, maximumAge: 0 }
+        );
+      } else {
+        clearTimeout(timerId);
+        const fallbackSpot: ParkingSpot = {
+          id: `spot_${Date.now()}`,
+          latitude: 41.0082,
+          longitude: 28.9784,
+          accuracy: 60,
+          timestamp: Date.now(),
+          address: "AVM Kapalı Otopark (-2. Kat)",
+          isLowGpsSignal: true,
+        };
+        safeResolve(fallbackSpot, true);
+      }
     });
   }
 

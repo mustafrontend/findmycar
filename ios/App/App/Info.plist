@@ -45,5 +45,13 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Find My Car needs your location to pinpoint your parked car and guide you back with walking directions.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Find My Car needs location access to track your parked vehicle position and provide live compass radar navigation.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Find My Car needs camera access to take photos of parking garage column numbers and parking tickets.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Find My Car needs microphone access to record quick 5-second voice memos about your parking spot.</string>
 </dict>
 </plist>

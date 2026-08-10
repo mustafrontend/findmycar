@@ -19,6 +19,7 @@ interface ParkingStoreState {
   
   // UI & i18n
   language: LanguageCode;
+  isLanguageModalOpen: boolean;
   isProModalOpen: boolean;
   isCameraModalOpen: boolean;
   isAppStoreProfileOpen: boolean;
@@ -47,6 +48,7 @@ interface ParkingStoreState {
 
   // UI actions
   setLanguage: (lang: LanguageCode) => void;
+  setLanguageModalOpen: (open: boolean) => void;
   setProModalOpen: (open: boolean) => void;
   setCameraModalOpen: (open: boolean) => void;
   setAppStoreProfileOpen: (open: boolean) => void;
@@ -70,6 +72,7 @@ export const useParkingStore = create<ParkingStoreState>((set, get) => {
   meterState: storageService.getMeterState(),
   
   language: storageService.getLanguage(),
+  isLanguageModalOpen: !storageService.isLanguageSelected(),
   isProModalOpen: false,
   isCameraModalOpen: false,
   isAppStoreProfileOpen: false,
@@ -247,13 +250,15 @@ export const useParkingStore = create<ParkingStoreState>((set, get) => {
 
   setLanguage: (lang: LanguageCode) => {
     storageService.saveLanguage(lang);
+    storageService.setLanguageSelected(true);
     if (typeof document !== 'undefined') {
       document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
       document.documentElement.lang = lang;
     }
-    set({ language: lang });
+    set({ language: lang, isLanguageModalOpen: false });
   },
 
+  setLanguageModalOpen: (open: boolean) => set({ isLanguageModalOpen: open }),
   setProModalOpen: (open: boolean) => set({ isProModalOpen: open }),
   setCameraModalOpen: (open: boolean) => set({ isCameraModalOpen: open }),
   setAppStoreProfileOpen: (open: boolean) => set({ isAppStoreProfileOpen: open }),

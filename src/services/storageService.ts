@@ -6,6 +6,7 @@ const STORAGE_KEYS = {
   PARKING_METER: 'findmycar_meter_state',
   PRO_STATE: 'findmycar_pro_state',
   LANGUAGE: 'findmycar_language',
+  LANGUAGE_SELECTED: 'findmycar_language_selected',
   SPOT_HISTORY: 'findmycar_spot_history',
 };
 
@@ -130,6 +131,14 @@ export class StorageService {
 
   public saveLanguage(lang: LanguageCode): void {
     localStorage.setItem(STORAGE_KEYS.LANGUAGE, lang);
+  }
+
+  public isLanguageSelected(): boolean {
+    return localStorage.getItem(STORAGE_KEYS.LANGUAGE_SELECTED) === 'true';
+  }
+
+  public setLanguageSelected(selected: boolean = true): void {
+    localStorage.setItem(STORAGE_KEYS.LANGUAGE_SELECTED, selected ? 'true' : 'false');
   }
 
   public getLanguage(): LanguageCode {

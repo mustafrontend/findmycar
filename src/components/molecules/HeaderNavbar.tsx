@@ -16,6 +16,7 @@ export const HeaderNavbar: React.FC = () => {
     isWidgetPreviewOpen,
     setHistoryOpen,
     setFlashlightOpen,
+    setLanguageModalOpen,
   } = useParkingStore();
 
   const t = translations[language];
@@ -36,95 +37,106 @@ export const HeaderNavbar: React.FC = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-30 bg-slate-50/90 backdrop-blur-md border-b-[0.5px] border-slate-200/80 px-4 py-3">
-      <div className="max-w-md mx-auto flex items-center justify-between gap-2">
-        {/* Brand Logo & Name */}
-        <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-md">
-            <Car className="w-5 h-5 text-emerald-400" />
+    <header
+      className="sticky top-0 z-30 bg-slate-50/95 backdrop-blur-md border-b-[0.5px] border-slate-200/80 px-4 pb-3"
+      style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.75rem)' }}
+    >
+      <div className="max-w-md mx-auto space-y-2.5">
+        {/* Main Row: Logo, Brand Name, Pro Upgrade, Language Switcher */}
+        <div className="flex items-center justify-between gap-2">
+          {/* Brand Logo & Name */}
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="w-9 h-9 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-md">
+              <Car className="w-4.5 h-4.5 text-emerald-400" />
+            </div>
+            <div>
+              <h1 className="text-sm font-black tracking-tight text-slate-900 leading-tight">
+                {t.appName}
+              </h1>
+              <p className="text-[10px] font-medium text-slate-500 line-clamp-1 max-w-[130px] sm:max-w-none">
+                {t.appSubtitle}
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-base font-black tracking-tight text-slate-900 leading-tight">
-              {t.appName}
-            </h1>
-            <p className="text-[11px] font-medium text-slate-500 line-clamp-1">
-              {t.appSubtitle}
-            </p>
+
+          {/* Right Top Actions: Pro Badge & Language Dropdown */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Pro Status / Upgrade Badge */}
+            {proState.isProUnlocked ? (
+              <Badge variant="emerald" icon={<Sparkles className="w-3 h-3 text-emerald-600" />}>
+                PRO
+              </Badge>
+            ) : (
+              <button
+                onClick={() => setProModalOpen(true)}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-black shadow-xs hover:brightness-105 active:scale-95 transition-all"
+              >
+                <Sparkles className="w-3 h-3" />
+                <span>$2.99</span>
+              </button>
+            )}
+
+            {/* Language Selector Button (Opens Onboarding / Dropdown) */}
+            <div className="relative group">
+              <button
+                type="button"
+                onClick={() => setLanguageModalOpen(true)}
+                className="flex items-center gap-1 px-2 py-1 rounded-xl border-[0.5px] border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all"
+              >
+                <Globe className="w-3.5 h-3.5 text-slate-400" />
+                <span>{languages.find((l) => l.code === language)?.flag}</span>
+                <span className="text-[11px]">{language.toUpperCase()}</span>
+              </button>
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value as LanguageCode)}
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+              >
+                {languages.map((l) => (
+                  <option key={l.code} value={l.code}>
+                    {l.flag} {l.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-1">
-          {/* History Agenda */}
+        {/* Quick Action Bar Subrow */}
+        <div className="flex items-center justify-between gap-1.5 pt-1 border-t border-slate-200/50">
           <button
             onClick={() => setHistoryOpen(true)}
-            className="p-2 rounded-xl border-[0.5px] border-slate-200 bg-white hover:bg-slate-100/80 text-slate-700 transition-all active:scale-95"
-            title="Park Geçmişi Ajandası"
+            className="flex-1 py-1.5 px-2 rounded-xl border-[0.5px] border-slate-200 bg-white hover:bg-slate-100/80 text-slate-700 text-[11px] font-extrabold flex items-center justify-center gap-1 transition-all active:scale-95 shadow-2xs"
           >
-            <History className="w-4 h-4 text-indigo-600" />
+            <History className="w-3.5 h-3.5 text-indigo-600" />
+            <span>Geçmiş Ajanda</span>
           </button>
 
-          {/* Flashlight */}
           <button
             onClick={() => setFlashlightOpen(true)}
-            className="p-2 rounded-xl border-[0.5px] border-slate-200 bg-white hover:bg-slate-100/80 text-slate-700 transition-all active:scale-95"
-            title="Gece Otopark Feneri"
+            className="flex-1 py-1.5 px-2 rounded-xl border-[0.5px] border-slate-200 bg-white hover:bg-slate-100/80 text-slate-700 text-[11px] font-extrabold flex items-center justify-center gap-1 transition-all active:scale-95 shadow-2xs"
           >
-            <Zap className="w-4 h-4 text-amber-500 fill-amber-500/20" />
+            <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500/20" />
+            <span>Fener Modu</span>
           </button>
 
-          {/* Lock Screen Widget Toggle */}
           <button
             onClick={() => setWidgetPreviewOpen(!isWidgetPreviewOpen)}
-            className="p-2 rounded-xl border-[0.5px] border-slate-200 bg-white hover:bg-slate-100/80 text-slate-700 transition-all active:scale-95"
+            className="py-1.5 px-2.5 rounded-xl border-[0.5px] border-slate-200 bg-white hover:bg-slate-100/80 text-slate-700 text-[11px] font-extrabold flex items-center justify-center gap-1 transition-all active:scale-95 shadow-2xs"
             title={t.lockScreenWidgetTitle}
           >
-            <Smartphone className="w-4 h-4 text-sky-600" />
+            <Smartphone className="w-3.5 h-3.5 text-sky-600" />
+            <span>Widget</span>
           </button>
 
-          {/* App Store Developer Profile */}
           <button
             onClick={() => setAppStoreProfileOpen(true)}
-            className="p-2 rounded-xl border-[0.5px] border-slate-200 bg-white hover:bg-slate-100/80 text-slate-700 transition-all active:scale-95"
+            className="py-1.5 px-2.5 rounded-xl border-[0.5px] border-slate-200 bg-white hover:bg-slate-100/80 text-slate-700 text-[11px] font-extrabold flex items-center justify-center gap-1 transition-all active:scale-95 shadow-2xs"
             title="App Store Geliştirici Profili"
           >
-            <Apple className="w-4 h-4 text-slate-900" />
+            <Apple className="w-3.5 h-3.5 text-slate-900" />
+            <span>Profil</span>
           </button>
-
-          {/* Pro Status / Upgrade Badge */}
-          {proState.isProUnlocked ? (
-            <Badge variant="emerald" icon={<Sparkles className="w-3 h-3 text-emerald-600" />}>
-              PRO
-            </Badge>
-          ) : (
-            <button
-              onClick={() => setProModalOpen(true)}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-black shadow-xs hover:brightness-105 active:scale-95 transition-all"
-            >
-              <Sparkles className="w-3 h-3" />
-              <span>$2.99</span>
-            </button>
-          )}
-
-          {/* Language Selector */}
-          <div className="relative group">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl border-[0.5px] border-slate-200 bg-white text-xs font-bold text-slate-700 cursor-pointer hover:bg-slate-50 transition-all">
-              <Globe className="w-3.5 h-3.5 text-slate-400" />
-              <span>{languages.find((l) => l.code === language)?.flag}</span>
-              <span>{language.toUpperCase()}</span>
-            </div>
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value as LanguageCode)}
-              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-            >
-              {languages.map((l) => (
-                <option key={l.code} value={l.code}>
-                  {l.flag} {l.label}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
       </div>
     </header>

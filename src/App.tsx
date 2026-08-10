@@ -12,6 +12,7 @@ import { FlashlightModal } from './components/molecules/FlashlightModal';
 import { ParkingHistoryDrawer } from './components/organisms/ParkingHistoryDrawer';
 import { ProPaywallModal } from './components/organisms/ProPaywallModal';
 import { AppStoreProfileModal } from './components/organisms/AppStoreProfileModal';
+import { FirstLaunchLanguageModal } from './components/organisms/FirstLaunchLanguageModal';
 import { useParkingStore } from './store/parkingStore';
 import { ShieldCheck, HardDrive } from 'lucide-react';
 
@@ -56,6 +57,7 @@ export function App() {
       </main>
 
       {/* Modals & Drawers */}
+      <FirstLaunchLanguageModal />
       <CameraModal />
       <FlashlightModal />
       <ParkingHistoryDrawer />

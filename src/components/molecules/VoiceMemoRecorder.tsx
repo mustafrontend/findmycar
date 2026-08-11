@@ -12,25 +12,47 @@ export const VoiceMemoRecorder: React.FC = () => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const mimeTypeRef = useRef<string>('');
 
   if (!currentSpot) return null;
+
+  const getSupportedMimeType = (): string => {
+    if (typeof MediaRecorder === 'undefined') return '';
+    const types = ['audio/mp4', 'audio/aac', 'audio/m4a', 'audio/webm;codecs=opus', 'audio/webm'];
+    for (const t of types) {
+      if (MediaRecorder.isTypeSupported(t)) {
+        return t;
+      }
+    }
+    return '';
+  };
 
   const startRecording = async () => {
     try {
       soundService.playClickSound();
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("Cihazınızda sesli not kaydı desteklenmiyor.");
+        return;
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      const mimeType = getSupportedMimeType();
+      mimeTypeRef.current = mimeType;
+
+      const options = mimeType ? { mimeType } : undefined;
+      const mediaRecorder = new MediaRecorder(stream, options);
       mediaRecorderRef.current = mediaRecorder;
       chunksRef.current = [];
 
       mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
+        if (e.data && e.data.size > 0) {
           chunksRef.current.push(e.data);
         }
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        const blobType = mimeTypeRef.current || 'audio/mp4';
+        const blob = new Blob(chunksRef.current, { type: blobType });
         const reader = new FileReader();
         reader.onloadend = () => {
           if (typeof reader.result === 'string') {
@@ -41,7 +63,7 @@ export const VoiceMemoRecorder: React.FC = () => {
         stream.getTracks().forEach((track) => track.stop());
       };
 
-      mediaRecorder.start();
+      mediaRecorder.start(100);
       setIsRecording(true);
 
       // Auto stop after 7 seconds max
@@ -50,8 +72,9 @@ export const VoiceMemoRecorder: React.FC = () => {
           stopRecording();
         }
       }, 7000);
-    } catch {
-      alert("Mikrofon izni verilmedi veya ses kaydı desteklenmiyor.");
+    } catch (err: unknown) {
+      console.warn("Audio recording error:", err);
+      alert("Mikrofon izni verilmedi veya ses kaydı başlatılamadı.");
     }
   };
 
@@ -72,12 +95,19 @@ export const VoiceMemoRecorder: React.FC = () => {
       const audio = new Audio(currentSpot.audioUrl);
       audioRef.current = audio;
       audio.onended = () => setIsPlaying(false);
-      audio.play();
+      audio.onerror = () => {
+        setIsPlaying(false);
+        alert("Sesli not oynatılamadı.");
+      };
+      audio.play().catch(() => setIsPlaying(false));
       setIsPlaying(true);
     }
   };
 
   const deleteAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
     updateAudioUrl('');
     setIsPlaying(false);
   };

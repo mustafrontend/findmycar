@@ -4,6 +4,7 @@ import { storageService } from '../services/storageService';
 import { locationService } from '../services/locationService';
 import { soundService } from '../services/soundService';
 import confetti from 'canvas-confetti';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 interface ParkingStoreState {
   // Core state
@@ -201,7 +202,7 @@ export const useParkingStore = create<ParkingStoreState>((set, get) => {
     });
   },
 
-  setTimer: (durationMinutes: number) => {
+  setTimer: async (durationMinutes: number) => {
     soundService.playClickSound();
     const newTimer: ParkingTimerState = {
       enabled: true,
@@ -212,9 +213,39 @@ export const useParkingStore = create<ParkingStoreState>((set, get) => {
     };
     storageService.saveTimerState(newTimer);
     set({ timerState: newTimer });
+
+    // Request Web Notification permissions
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission !== 'granted') {
+      try {
+        await Notification.requestPermission();
+      } catch (err) {
+        console.warn("Web notification permission error:", err);
+      }
+    }
+
+    // Schedule Capacitor Native Local Notification
+    try {
+      const perm = await LocalNotifications.requestPermissions();
+      if (perm.display === 'granted') {
+        const triggerTime = new Date(Date.now() + durationMinutes * 60 * 1000);
+        await LocalNotifications.schedule({
+          notifications: [
+            {
+              title: "⚠️ Otopark Süreniz Bitiyor!",
+              body: `${durationMinutes} dakikalık otopark süreniz doldu! Lütfen aracınızı kontrol edin.`,
+              id: 1001,
+              schedule: { at: triggerTime },
+              sound: 'beep.wav',
+            },
+          ],
+        });
+      }
+    } catch (err) {
+      console.warn("Capacitor LocalNotifications schedule error:", err);
+    }
   },
 
-  cancelTimer: () => {
+  cancelTimer: async () => {
     const disabledTimer: ParkingTimerState = {
       enabled: false,
       startTime: null,
@@ -224,6 +255,12 @@ export const useParkingStore = create<ParkingStoreState>((set, get) => {
     };
     storageService.saveTimerState(disabledTimer);
     set({ timerState: disabledTimer });
+
+    try {
+      await LocalNotifications.cancel({ notifications: [{ id: 1001 }] });
+    } catch (err) {
+      console.warn("LocalNotifications cancel error:", err);
+    }
   },
 
   updateMeterRate: (rate: number, currency: string) => {
@@ -244,8 +281,15 @@ export const useParkingStore = create<ParkingStoreState>((set, get) => {
     const state = get();
     soundService.playWarningSound();
     set({ bluetoothConnected: false });
-    // Simulate auto-save on disconnect
+    // Save location automatically on disconnect
     await state.saveCurrentLocation();
+
+    // Trigger native or browser notification toast
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+      new Notification("🚗 Bluetooth Bağlantısı Kesildi!", {
+        body: "Aracınızdan uzaklaştınız — Park konumunuz otomatik olarak hafızaya alındı.",
+      });
+    }
   },
 
   setLanguage: (lang: LanguageCode) => {
@@ -282,8 +326,8 @@ export const useParkingStore = create<ParkingStoreState>((set, get) => {
       set({ timerState: updatedTimer });
 
       if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-        new Notification("⏰ Parking Timer Warning", {
-          body: "Only 15 minutes left on your parking meter!",
+        new Notification("⏰ Otopark Süre Uyarısı", {
+          body: "Otopark sürenizin dolmasına son 15 dakika kaldı!",
         });
       }
     }
@@ -296,8 +340,8 @@ export const useParkingStore = create<ParkingStoreState>((set, get) => {
       set({ timerState: updatedTimer });
 
       if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-        new Notification("⚠️ Parking Meter Expired!", {
-          body: "Your parking time has expired. Please check your car.",
+        new Notification("⚠️ Otopark Süreniz Doldu!", {
+          body: "Otopark süreniz dolmuştur. Lütfen aracınızı kontrol edin.",
         });
       }
     }

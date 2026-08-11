@@ -188,27 +188,34 @@ export const useParkingStore = create<ParkingStoreState>((set, get) => {
   },
 
   unlockPro: async () => {
+    soundService.playClickSound();
+    let isSuccess = false;
     try {
-      await revenueCatService.purchasePro();
+      isSuccess = await revenueCatService.purchasePro();
     } catch (err) {
-      console.warn("RevenueCat native purchase dialog fallback:", err);
+      console.warn("RevenueCat native purchase error:", err);
     }
-    soundService.playSaveSuccessSound();
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
-    });
-    const newProState: ProState = {
-      isProUnlocked: true,
-      unlockedAt: Date.now(),
-      autoSaveBluetoothEnabled: true,
-    };
-    storageService.saveProState(newProState);
-    set({
-      proState: newProState,
-      isProModalOpen: false,
-    });
+
+    if (isSuccess) {
+      soundService.playSaveSuccessSound();
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+      });
+      const newProState: ProState = {
+        isProUnlocked: true,
+        unlockedAt: Date.now(),
+        autoSaveBluetoothEnabled: true,
+      };
+      storageService.saveProState(newProState);
+      set({
+        proState: newProState,
+        isProModalOpen: false,
+      });
+    } else {
+      console.log("Purchase cancelled or incomplete. Pro state locked.");
+    }
   },
 
   restorePurchases: async (): Promise<boolean> => {

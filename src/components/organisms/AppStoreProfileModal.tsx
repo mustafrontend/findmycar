@@ -1,14 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParkingStore } from '../../store/parkingStore';
 import { Card } from '../atoms/Card';
 import { Badge } from '../atoms/Badge';
-import { ShieldCheck, CheckCircle2, Apple, Globe, ExternalLink, HardDrive, Smartphone, X } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, Apple, Globe, ExternalLink, HardDrive, Smartphone, X, Trash2, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const AppStoreProfileModal: React.FC = () => {
-  const { isAppStoreProfileOpen, setAppStoreProfileOpen } = useParkingStore();
+  const {
+    isAppStoreProfileOpen,
+    setAppStoreProfileOpen,
+    deleteAccountAndData,
+    restorePurchases,
+  } = useParkingStore();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isAppStoreProfileOpen) return null;
+
+  const handleRestore = async () => {
+    setIsLoading(true);
+    await restorePurchases();
+    setIsLoading(false);
+  };
 
   const checklistItems = [
     { text: "Bundle Identifier: com.findmycar.parkedlocation", done: true },
@@ -17,6 +30,7 @@ export const AppStoreProfileModal: React.FC = () => {
     { text: "Gizlilik Politikası: %100 Cihaz İçi (Sıfır Veri Toplama)", done: true },
     { text: "In-App Purchase ($3.99 Ömür Boyu Kilit Açma)", done: true },
     { text: "Codemagic Otomatik TestFlight & IPA Build Pipeline", done: true },
+    { text: "Apple Madde 5.1.1(v) Hesabımı & Verilerimi Sil Özelliği", done: true },
   ];
 
   return (
@@ -80,10 +94,36 @@ export const AppStoreProfileModal: React.FC = () => {
               </div>
             </Card>
 
+            {/* Account Actions: Restore Purchases & Delete Account */}
+            <Card className="bg-slate-50 border-slate-200 space-y-2">
+              <span className="font-extrabold text-slate-900 flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" /> Hesap & Satın Alma Yönetimi
+              </span>
+              <div className="space-y-2 pt-1">
+                <button
+                  onClick={handleRestore}
+                  disabled={isLoading}
+                  className="w-full py-2.5 px-3 rounded-2xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-800 font-extrabold text-xs flex items-center justify-center gap-2 transition-all active:scale-98"
+                >
+                  <RefreshCw className={`w-4 h-4 text-emerald-600 ${isLoading ? 'animate-spin' : ''}`} />
+                  <span>Satın Alımları Geri Yükle (Restore Purchases)</span>
+                </button>
+
+                {/* Apple Mandatory Account Deletion (Section 5.1.1(v)) */}
+                <button
+                  onClick={deleteAccountAndData}
+                  className="w-full py-2.5 px-3 rounded-2xl bg-rose-50 border border-rose-200 hover:bg-rose-100 text-rose-700 font-extrabold text-xs flex items-center justify-center gap-2 transition-all active:scale-98"
+                >
+                  <Trash2 className="w-4 h-4 text-rose-600" />
+                  <span>Hesabımı ve Tüm Verilerimi Sil (Delete Account & Data)</span>
+                </button>
+              </div>
+            </Card>
+
             {/* Checklist */}
             <Card className="bg-slate-50 border-slate-200 space-y-2.5">
               <span className="font-extrabold text-slate-900 flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" /> App Store Gönderim Kontrol Listesi
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" /> App Store Gönderim Kontrol Listesi
               </span>
               <div className="space-y-2 pt-1">
                 {checklistItems.map((item, idx) => (
@@ -104,24 +144,24 @@ export const AppStoreProfileModal: React.FC = () => {
                 <div className="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between">
                   <span className="font-semibold text-slate-700">Gizlilik Politikası</span>
                   <a
-                    href="https://findmycar.app/privacy"
+                    href="https://raw.githack.com/mustafrontend/findmycar/main/public/privacy.html"
                     target="_blank"
                     rel="noreferrer"
                     className="text-sky-600 hover:text-sky-700 font-bold flex items-center gap-1 text-[11px]"
                   >
-                    <span>findmycar.app/privacy</span>
+                    <span>Gizlilik Politikası Oku</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
                 <div className="p-2.5 rounded-xl bg-white border border-slate-200 flex items-center justify-between">
                   <span className="font-semibold text-slate-700">Destek URL</span>
                   <a
-                    href="https://findmycar.app/support"
+                    href="https://raw.githack.com/mustafrontend/findmycar/main/public/support.html"
                     target="_blank"
                     rel="noreferrer"
                     className="text-sky-600 hover:text-sky-700 font-bold flex items-center gap-1 text-[11px]"
                   >
-                    <span>findmycar.app/support</span>
+                    <span>Destek Sayfası Oku</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>

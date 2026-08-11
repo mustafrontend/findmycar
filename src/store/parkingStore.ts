@@ -48,6 +48,9 @@ interface ParkingStoreState {
   toggleBluetoothSimulation: () => void;
   simulateBluetoothDisconnect: () => Promise<void>;
 
+  restorePurchases: () => Promise<boolean>;
+  deleteAccountAndData: () => void;
+
   // UI actions
   setLanguage: (lang: LanguageCode) => void;
   setLanguageModalOpen: (open: boolean) => void;
@@ -206,6 +209,47 @@ export const useParkingStore = create<ParkingStoreState>((set, get) => {
       proState: newProState,
       isProModalOpen: false,
     });
+  },
+
+  restorePurchases: async (): Promise<boolean> => {
+    soundService.playClickSound();
+    const isRestored = await revenueCatService.restorePurchases();
+    if (isRestored) {
+      soundService.playSaveSuccessSound();
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      const newProState: ProState = {
+        isProUnlocked: true,
+        unlockedAt: Date.now(),
+        autoSaveBluetoothEnabled: true,
+      };
+      storageService.saveProState(newProState);
+      set({ proState: newProState, isProModalOpen: false });
+      alert("✅ Satın alımlarınız başarıyla geri yüklendi! Pro erişiminiz aktif.");
+      return true;
+    } else {
+      alert("ℹ️ Aktif bir satın alma bulunamadı.");
+      return false;
+    }
+  },
+
+  deleteAccountAndData: () => {
+    if (confirm("⚠️ TÜM VERİLERİ VE HESABI SİL\n\nKaydedilmiş tüm park konumlarınız, fotoğraflarınız, sesli notlarınız ve tercihleriniz silinecektir. Devam etmek istiyor musunuz?")) {
+      soundService.playWarningSound();
+      storageService.clearAllAccountData();
+      set({
+        currentSpot: null,
+        userPosition: null,
+        navigationMetrics: null,
+        isLocating: false,
+        proState: { isProUnlocked: false, unlockedAt: null, autoSaveBluetoothEnabled: false },
+        timerState: { enabled: false, startTime: null, durationMinutes: 60, alert15MinFired: false, isExpired: false },
+        meterState: { enabled: false, hourlyRate: 50, currency: '₺' },
+        isProModalOpen: false,
+        isAppStoreProfileOpen: false,
+        isHistoryOpen: false,
+      });
+      alert("🗑️ Hesabınız ve tüm verileriniz başarıyla silindi.");
+    }
   },
 
   setTimer: async (durationMinutes: number) => {

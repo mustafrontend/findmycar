@@ -1,16 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParkingStore } from '../../store/parkingStore';
 import { translations } from '../../i18n/translations';
 import { Button } from '../atoms/Button';
 import { Badge } from '../atoms/Badge';
-import { AlarmClock, Bluetooth, Calculator, Check, ShieldCheck, Sparkles, X, Smartphone } from 'lucide-react';
+import { AlarmClock, Bluetooth, Calculator, Check, ShieldCheck, Sparkles, X, Smartphone, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const ProPaywallModal: React.FC = () => {
-  const { isProModalOpen, setProModalOpen, unlockPro, language } = useParkingStore();
+  const { isProModalOpen, setProModalOpen, unlockPro, restorePurchases, language } = useParkingStore();
   const t = translations[language];
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isProModalOpen) return null;
+
+  const handlePurchase = async () => {
+    setIsLoading(true);
+    await unlockPro();
+    setIsLoading(false);
+  };
+
+  const handleRestore = async () => {
+    setIsLoading(true);
+    await restorePurchases();
+    setIsLoading(false);
+  };
 
   return (
     <AnimatePresence>
@@ -88,25 +101,58 @@ export const ProPaywallModal: React.FC = () => {
             </div>
           </div>
 
-          {/* Pricing CTA */}
+          {/* Pricing CTA & Actions */}
           <div className="space-y-3">
             <Button
               fullWidth
               size="lg"
               variant="pro"
-              onClick={unlockPro}
+              isLoading={isLoading}
+              onClick={handlePurchase}
               leftIcon={<Sparkles className="w-5 h-5" />}
             >
-              {t.unlockProBtn} ($3.99)
+              Devam Et — {t.unlockProBtn} ($3.99)
             </Button>
 
-            <div className="flex items-center justify-center gap-4 text-[11px] font-bold text-slate-500 pt-1">
+            {/* Restore Purchases Button (Apple StoreKit Requirement) */}
+            <button
+              type="button"
+              onClick={handleRestore}
+              disabled={isLoading}
+              className="w-full py-2 text-xs font-extrabold text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5 transition-all"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${isLoading ? 'animate-spin' : ''}`} />
+              <span>Satın Alımları Geri Yükle (Restore Purchases)</span>
+            </button>
+
+            <div className="flex items-center justify-center gap-4 text-[11px] font-bold text-slate-500 pt-1 border-t border-slate-100">
               <span className="flex items-center gap-1">
                 <Check className="w-3.5 h-3.5 text-emerald-600" /> Abonesiz / Ömür Boyu
               </span>
               <span className="flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-sky-600" /> Apple / Google Güvenli
+                <ShieldCheck className="w-3.5 h-3.5 text-sky-600" /> Apple Güvenli Ödeme
               </span>
+            </div>
+
+            {/* Apple Legal Terms Footer */}
+            <div className="flex items-center justify-center gap-3 text-[10px] font-semibold text-slate-400 pt-1">
+              <a
+                href="https://raw.githack.com/mustafrontend/findmycar/main/public/privacy.html"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:underline hover:text-slate-600"
+              >
+                Gizlilik Politikası (Privacy Policy)
+              </a>
+              <span>•</span>
+              <a
+                href="https://raw.githack.com/mustafrontend/findmycar/main/public/support.html"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:underline hover:text-slate-600"
+              >
+                Kullanım Koşulları (Terms)
+              </a>
             </div>
           </div>
         </motion.div>

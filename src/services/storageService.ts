@@ -53,6 +53,10 @@ export class StorageService {
     localStorage.removeItem(STORAGE_KEYS.SPOT_HISTORY);
   }
 
+  public clearAllAccountData(): void {
+    localStorage.clear();
+  }
+
   public saveTimerState(timer: ParkingTimerState): void {
     localStorage.setItem(STORAGE_KEYS.PARKING_TIMER, JSON.stringify(timer));
   }

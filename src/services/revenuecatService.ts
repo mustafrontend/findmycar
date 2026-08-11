@@ -1,5 +1,4 @@
 import { Purchases } from '@revenuecat/purchases-capacitor';
-import type { ProState } from '../types/parking';
 
 export const REVENUECAT_API_KEY = 'appl_KOjWxMCuhPxHiktdodYApTkUQuY';
 export const PRODUCT_ID_PRO = 'com.findmycar.parkedlocation.pro';
@@ -47,17 +46,20 @@ export class RevenueCatService {
   public async purchasePro(): Promise<boolean> {
     try {
       await this.init();
-      const purchaseResult = await Purchases.purchaseProduct({
-        productIdentifier: PRODUCT_ID_PRO,
-      });
-      const isProActive =
-        Boolean(purchaseResult.customerInfo.entitlements.active['pro']) ||
-        Boolean(purchaseResult.customerInfo.entitlements.active['lifetime']) ||
-        Boolean(purchaseResult.customerInfo.allPurchasedProductIdentifiers.includes(PRODUCT_ID_PRO));
-      return isProActive;
+      const products = await Purchases.getProducts({ productIdentifiers: [PRODUCT_ID_PRO] });
+      if (products.products.length > 0) {
+        const purchaseResult = await Purchases.purchaseStoreProduct({
+          product: products.products[0],
+        });
+        const isProActive =
+          Boolean(purchaseResult.customerInfo.entitlements.active['pro']) ||
+          Boolean(purchaseResult.customerInfo.entitlements.active['lifetime']) ||
+          Boolean(purchaseResult.customerInfo.allPurchasedProductIdentifiers.includes(PRODUCT_ID_PRO));
+        return isProActive;
+      }
+      return false;
     } catch (err: unknown) {
       console.warn("RevenueCat purchasePro error:", err);
-      // Fallback for simulation / direct buy if user cancels or in sandbox
       return false;
     }
   }

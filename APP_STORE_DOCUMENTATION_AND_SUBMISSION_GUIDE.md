@@ -4,7 +4,7 @@
 > **Bundle ID:** `com.findmycar.parkedlocation`  
 > **Target Stores:** Apple App Store (iOS/iPadOS/watchOS) & Google Play Console  
 > **Framework:** React + Vite + TypeScript + Tailwind CSS + Capacitor  
-> **Monetization Model:** Freemium ($2.99 Lifetime Pro Purchase for Timer Alarms, Meter Calculator & Bluetooth Auto-Save)  
+> **Monetization Model:** Freemium ($3.99 Lifetime Pro Purchase for Timer Alarms, Meter Calculator & Bluetooth Auto-Save)  
 
 ---
 

@@ -31,7 +31,7 @@ export const BluetoothSimulatorCard: React.FC = () => {
             </div>
           </div>
           <Badge variant="sky" icon={<Lock className="w-3 h-3" />}>
-            PRO $2.99
+            PRO $3.99
           </Badge>
         </div>
 
@@ -43,7 +43,7 @@ export const BluetoothSimulatorCard: React.FC = () => {
             size="sm"
             leftIcon={<Sparkles className="w-3.5 h-3.5" />}
           >
-            Aç ($2.99)
+            Aç ($3.99)
           </Button>
         </div>
       </Card>

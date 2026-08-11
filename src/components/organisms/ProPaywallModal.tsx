@@ -35,7 +35,7 @@ export const ProPaywallModal: React.FC = () => {
               <Sparkles className="w-7 h-7" />
             </div>
             <Badge variant="amber" size="md">
-              TEK SEFERLİK ÖDEME $2.99
+              TEK SEFERLİK ÖDEME $3.99
             </Badge>
             <h2 className="text-xl font-black text-slate-900 tracking-tight">
               {t.unlockProTitle}
@@ -97,7 +97,7 @@ export const ProPaywallModal: React.FC = () => {
               onClick={unlockPro}
               leftIcon={<Sparkles className="w-5 h-5" />}
             >
-              {t.unlockProBtn} ($2.99)
+              {t.unlockProBtn} ($3.99)
             </Button>
 
             <div className="flex items-center justify-center gap-4 text-[11px] font-bold text-slate-500 pt-1">

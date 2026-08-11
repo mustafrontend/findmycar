@@ -15,7 +15,7 @@ export const AppStoreProfileModal: React.FC = () => {
     { text: "Age Rating: 4+ (İçerik/Şiddet Barındırmaz)", done: true },
     { text: "12 Küresel Dil Desteği & RTL Yerelleştirmesi", done: true },
     { text: "Gizlilik Politikası: %100 Cihaz İçi (Sıfır Veri Toplama)", done: true },
-    { text: "In-App Purchase ($2.99 Ömür Boyu Kilit Açma)", done: true },
+    { text: "In-App Purchase ($3.99 Ömür Boyu Kilit Açma)", done: true },
     { text: "Codemagic Otomatik TestFlight & IPA Build Pipeline", done: true },
   ];
 
@@ -75,7 +75,7 @@ export const AppStoreProfileModal: React.FC = () => {
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-slate-400 block">Monetizasyon</span>
-                  <span className="text-xs font-bold text-amber-600">$2.99 Ömür Boyu Pro</span>
+                  <span className="text-xs font-bold text-amber-600">$3.99 Ömür Boyu Pro</span>
                 </div>
               </div>
             </Card>

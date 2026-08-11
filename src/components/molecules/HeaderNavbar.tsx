@@ -74,7 +74,7 @@ export const HeaderNavbar: React.FC = () => {
                 className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-black shadow-xs hover:brightness-105 active:scale-95 transition-all"
               >
                 <Sparkles className="w-3 h-3" />
-                <span>$2.99</span>
+                <span>$3.99</span>
               </button>
             )}
 

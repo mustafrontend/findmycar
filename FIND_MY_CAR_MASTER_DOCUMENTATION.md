@@ -6,7 +6,7 @@
 > **Technology Stack:** React 19 + TypeScript (Strict) + Tailwind CSS v4 + Zustand + Leaflet + Capacitor 7 (Swift Package Manager)  
 > **Architecture & Philosophy:** "Light Mode First" & "Kinetic Lithography Architecture"  
 > **Infrastructure Cost:** $0 / Month (100% Device-Side LocalStorage & CoreData Persistence)  
-> **Monetization Price:** $2.99 Lifetime Pro Unlock  
+> **Monetization Price:** $3.99 Lifetime Pro Unlock  
 
 ---
 
@@ -55,7 +55,7 @@ Uygulamanın temel felsefesi **0 saniye gecikme** ile araç konumunu hafızaya a
 
 ---
 
-## 💎 3. $2.99 Pro Monetizasyon Modülü
+## 💎 3. $3.99 Pro Monetizasyon Modülü
 
 - **Park Süresi Sayacı & Alarm (`ParkingTimerCard.tsx`):**
   - Otopark süresi bitmeden 15 dakika önce yüksek sesli alarm beepi ve bildirim gönderir.

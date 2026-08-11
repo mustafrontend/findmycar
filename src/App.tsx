@@ -51,7 +51,7 @@ export function App() {
           </>
         )}
 
-        {/* $2.99 Pro Feature Modules */}
+        {/* $3.99 Pro Feature Modules */}
         <ParkingTimerCard />
         <BluetoothSimulatorCard />
       </main>

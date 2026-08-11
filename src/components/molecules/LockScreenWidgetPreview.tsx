@@ -30,7 +30,7 @@ export const LockScreenWidgetPreview: React.FC = () => {
 
           <div className="flex items-center gap-2 mb-3">
             <Badge variant="sky" size="sm">
-              iOS Lock Screen Widget & Dynamic Island Simülatörü
+              iOS Lock Screen Widget & Dynamic Island Live Activity
             </Badge>
           </div>
 

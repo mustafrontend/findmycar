@@ -66,7 +66,7 @@ export const BluetoothSimulatorCard: React.FC = () => {
           variant={bluetoothConnected ? 'emerald' : 'amber'}
           icon={<Radio className="w-3 h-3 animate-pulse" />}
         >
-          {bluetoothConnected ? 'Bluetooth Bağlı 🚗' : 'Koptu (Kaydedildi)'}
+          {bluetoothConnected ? 'Bluetooth Bağlı 🚗' : 'Otomatik Kaydedildi'}
         </Badge>
       </div>
 
@@ -74,7 +74,7 @@ export const BluetoothSimulatorCard: React.FC = () => {
         <div className="flex items-center justify-between text-xs">
           <span className="font-bold text-slate-700">Araba Bağlantı Durumu:</span>
           <span className="font-extrabold text-slate-900">
-            {bluetoothConnected ? 'BMW iX3 Bluetooth (Aktif)' : 'Bağlantı Kesildi (Konum Kaydedildi)'}
+            {bluetoothConnected ? 'Araç Bluetooth (Aktif Korumada)' : 'Bağlantı Kesildi (Konum Kaydedildi)'}
           </span>
         </div>
 
@@ -85,7 +85,7 @@ export const BluetoothSimulatorCard: React.FC = () => {
           size="sm"
           leftIcon={<Bluetooth className="w-4 h-4 text-sky-600" />}
         >
-          {t.bluetoothDisconnectedSimulate} ⚡
+          Bluetooth Otomatik Araç Konum Kaydını Tetikle 🚗
         </Button>
       </div>
     </Card>

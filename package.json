@@ -19,6 +19,7 @@
     "@capacitor/geolocation": "^8.2.1",
     "@capacitor/ios": "^7.0.1",
     "@capacitor/local-notifications": "^8.2.1",
+    "@revenuecat/purchases-capacitor": "^13.4.0",
     "autoprefixer": "^10.5.4",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",

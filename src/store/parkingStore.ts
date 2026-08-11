@@ -3,6 +3,7 @@ import type { LanguageCode, NavigationMetrics, ParkingMeterState, ParkingSpot, P
 import { storageService } from '../services/storageService';
 import { locationService } from '../services/locationService';
 import { soundService } from '../services/soundService';
+import { revenueCatService } from '../services/revenuecatService';
 import confetti from 'canvas-confetti';
 import { LocalNotifications } from '@capacitor/local-notifications';
 
@@ -183,7 +184,12 @@ export const useParkingStore = create<ParkingStoreState>((set, get) => {
     });
   },
 
-  unlockPro: () => {
+  unlockPro: async () => {
+    try {
+      await revenueCatService.purchasePro();
+    } catch (err) {
+      console.warn("RevenueCat native purchase dialog fallback:", err);
+    }
     soundService.playSaveSuccessSound();
     confetti({
       particleCount: 100,
